@@ -212,9 +212,9 @@ inline void load_data(char *filename, std::vector<std::vector<float>> &res, unsi
 
 int main(int argc, char **argv)
 {
-    if (argc != 6)
+    if (argc != 8)
     {
-        std::cout << argv[0] << " graph_file attributetable_file query_file groundtruth_file attributes_query_file "
+        std::cout << argv[0] << " graph_file attributetable_file query_file groundtruth_file attributes_query_file k ef_search"
                   << std::endl;
         exit(-1);
     }
@@ -238,8 +238,13 @@ int main(int argc, char **argv)
     vector<pair<string, string>> configs = {{"weight_search", "140000"}};
     index.SetConfigs(configs);
 
-    int search_k = 10;
-    int ef_search = 250;
+    unsigned search_k =  atoi(argv[6]);
+    if (search_k == 0)
+    {
+        std::cerr << "k is invalid" << std::endl;
+        exit(-1);
+    }
+    int ef_search = atoi(argv[7]);
 
     vector<vector<pair<int, float>>> result(query_num);
     auto a = std::chrono::high_resolution_clock::now();
@@ -251,6 +256,27 @@ int main(int argc, char **argv)
     auto b = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> s_diff = b - a;
     //评估
+
+// #################### my stuff ############################
+    char* attributes_data_file;
+
+    // Convert to std::string for find and replace operations
+    std::string attributes_query_file_str = attributes_query_file;
+    size_t pos = attributes_query_file_str.find("query");
+    if (pos != std::string::npos) {
+        attributes_query_file_str.replace(pos, 5, "base");
+    }
+
+    // Convert back to char* if needed
+    attributes_data_file = strdup(attributes_query_file_str.c_str());
+
+    vector<vector<string>> attributes_data;
+    unsigned attributes_data_num, attributes_data_dim;
+    load_data_txt(attributes_data_file, attributes_data_num, attributes_data_dim, attributes_data);
+    
+    int fl_cnt = 0;
+// #################### my stuff ############################
+
     int cnt = 0;
     for (unsigned i = 0; i < ground_num; i++)
     {
@@ -262,12 +288,17 @@ int main(int argc, char **argv)
                 if (result[i][j].first == ground_load[i * ground_dim + k])
                     break;
             }
-            if (k == search_k)
+            if (k == search_k){
+                if (attributes_query[i] != attributes_data[result[i][j].first]) {
+                    fl_cnt++;
+                }
                 cnt++;
+            }
         }
     }
     float acc = 1 - (float)cnt / (ground_num * search_k);
-    std::cerr << "Search Time: " << s_diff.count() << " " << search_k << "NN accuracy: " << acc << " Distcount: " << act << std::endl;
+    float fl_per = (float)fl_cnt / (ground_num * search_k);
+    std::cerr << "Search Time: " << s_diff.count() << " " << search_k << "NN accuracy: " << acc << " Distcount: " << act << " False labels: " << fl_per <<  std::endl;
 
     peak_memory_footprint();
 }
