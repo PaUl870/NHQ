@@ -205,13 +205,13 @@ int main(int argc, char **argv)
     res[i].resize(search_k);
 
   // Warm up
-  for (int loop = 0; loop < 3; ++loop)
-  {
-    for (unsigned i = 0; i < 10; ++i)
-    {
-      index.SearchWithOptGraph(attributes_query[i], query_load + i * dim, search_k, paras, res[i].data());
-    }
-  }
+  // for (int loop = 0; loop < 3; ++loop)
+  // {
+  //   for (unsigned i = 0; i < 10; ++i)
+  //   {
+  //     index.SearchWithOptGraph(attributes_query[i], query_load + i * dim, search_k, paras, res[i].data());
+  //   }
+  // }
 
   auto s = std::chrono::high_resolution_clock::now();
   for (unsigned i = 0; i < query_num; i++)
