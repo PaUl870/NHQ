@@ -1,5 +1,6 @@
 #include <chrono>
 
+
 #include "efanna2e/index_random.h"
 #include "efanna2e/index_graph.h"
 #include "efanna2e/util.h"
@@ -142,9 +143,9 @@ void peak_memory_footprint()
 
 int main(int argc, char **argv)
 {
-  if (argc != 7)
+  if (argc != 9)
   {
-    std::cout << argv[0] << " graph_path attributetable_path data_path query_path query_att_path groundtruth_path"
+    std::cout << argv[0] << " graph_path attributetable_path data_path query_path query_att_path groundtruth_path search_k L_search"
               << std::endl;
     exit(-1);
   }
@@ -187,10 +188,16 @@ int main(int argc, char **argv)
   index.LoadAttributeTable(argv[2]);
   index.OptimizeGraph(data_load);
 
-  unsigned search_k = 10;
+  unsigned search_k =  atoi(argv[7]);
+  if (search_k == 0)
+  {
+    std::cerr << "k is invalid" << std::endl;
+    exit(-1);
+  }
+  unsigned L_search =  atoi(argv[8]);
   float weight_search = 140000;
   efanna2e::Parameters paras;
-  paras.Set<unsigned>("L_search", 100);
+  paras.Set<unsigned>("L_search", L_search);
   paras.Set<float>("weight_search", weight_search);
 
   std::vector<std::vector<unsigned>> res(query_num);
@@ -214,6 +221,26 @@ int main(int argc, char **argv)
   auto e = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> diff = e - s;
 
+// #################### my stuff ############################
+  char* attributes_data_file;
+
+  // Convert to std::string for find and replace operations
+  std::string attributes_query_file_str = attributes_query_file;
+  size_t pos = attributes_query_file_str.find("query");
+  if (pos != std::string::npos) {
+    attributes_query_file_str.replace(pos, 5, "base");
+  }
+
+  // Convert back to char* if needed
+  attributes_data_file = strdup(attributes_query_file_str.c_str());
+
+  vector<vector<string>> attributes_data;
+  unsigned attributes_data_num, attributes_data_dim;
+  load_data_txt(attributes_data_file, attributes_data_num, attributes_data_dim, attributes_data);
+
+  int fl_cnt = 0;
+// #################### my stuff ############################
+
   int cnt = 0;
   for (unsigned i = 0; i < ground_num; i++)
   {
@@ -225,13 +252,19 @@ int main(int argc, char **argv)
         if (res[i][j] == ground_load[i * ground_dim + k])
           break;
       }
-      if (k == ground_dim)
+      if (k == ground_dim){
+        if (attributes_query[i] != attributes_data[res[i][j]]) {
+          fl_cnt++;
+        }
         cnt++;
+      }
+        
     }
   }
   int act = 0;
   float acc = 1 - (float)cnt / (ground_num * search_k);
-  std::cerr << "Search Time: " << diff.count() << " " << search_k << "NN accuracy: " << acc << " Distcount: " << act << std::endl;
+  float fl_per = (float)fl_cnt / (ground_num * search_k);
+  std::cerr << "Search Time: " << diff.count() << " " << search_k << "NN accuracy: " << acc << " Distcount: " << act << " False labels: " << fl_per <<  std::endl;
 
   peak_memory_footprint();
   return 0;
