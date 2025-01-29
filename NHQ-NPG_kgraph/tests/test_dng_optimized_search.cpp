@@ -214,7 +214,7 @@ int main(int argc, char **argv)
   // }
 
   auto s = std::chrono::high_resolution_clock::now();
-  # pragma omp parallel for
+#pragma omp parallel for
   for (unsigned i = 0; i < query_num; i++)
   {
     index.SearchWithOptGraph(attributes_query[i], query_load + i * dim, search_k, paras, res[i].data());
