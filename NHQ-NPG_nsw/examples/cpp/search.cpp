@@ -212,9 +212,9 @@ inline void load_data(char *filename, std::vector<std::vector<float>> &res, unsi
 
 int main(int argc, char **argv)
 {
-    if (argc != 8)
+    if (argc != 9)
     {
-        std::cout << argv[0] << " graph_file attributetable_file query_file groundtruth_file attributes_query_file k ef_search"
+        std::cout << argv[0] << " graph_file attributetable_file query_file groundtruth_file attributes_query_file k ef_search weight"
                   << std::endl;
         exit(-1);
     }
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
     n2::Hnsw index;
     index.LoadModel(argv[1]);
     index.LoadAttributeTable(argv[2]);
-    float weight_search = atof(argv[9]);
+    float weight_search = atof(argv[8]);
     vector<pair<string, string>> configs = {{"weight_search", to_string(weight_search)}};
     index.SetConfigs(configs);
 
