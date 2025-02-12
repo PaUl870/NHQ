@@ -143,9 +143,9 @@ void peak_memory_footprint()
 
 int main(int argc, char **argv)
 {
-  if (argc != 9)
+  if (argc != 10)
   {
-    std::cout << argv[0] << " graph_path attributetable_path data_path query_path query_att_path groundtruth_path search_k L_search"
+    std::cout << argv[0] << " graph_path attributetable_path data_path query_path query_att_path groundtruth_path search_k L_search weight"
               << std::endl;
     exit(-1);
   }
