@@ -235,7 +235,8 @@ int main(int argc, char **argv)
     n2::Hnsw index;
     index.LoadModel(argv[1]);
     index.LoadAttributeTable(argv[2]);
-    vector<pair<string, string>> configs = {{"weight_search", "140000"}};
+    float weight_search = atof(argv[9]);
+    vector<pair<string, string>> configs = {{"weight_search", to_string(weight_search)}};
     index.SetConfigs(configs);
 
     unsigned search_k =  atoi(argv[6]);
