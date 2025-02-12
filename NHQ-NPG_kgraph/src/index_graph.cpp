@@ -1313,7 +1313,7 @@ namespace efanna2e
             }
           }
           //dist += dist * cnt / (float)attribute_number_;
-          dist += cnt * weight_search;
+          fusion_distance(dist, cnt);
 
           dist_cout++;
           if (dist >= retset[L - 1].distance)
@@ -1451,7 +1451,7 @@ namespace efanna2e
         }
       }
       //dist += dist * cnt / (float)attribute_number_;
-      dist += cnt * weight_search;
+      fusion_distance(dist, cnt);
 
       // float d = distance_ -> compare(x, query, (unsigned)dimension_);
       // std::cout << d << std::endl;
@@ -1502,7 +1502,7 @@ namespace efanna2e
             }
           }
           //dist += dist * cnt / (float)attribute_number_;
-          dist += cnt * weight_search;
+          fusion_distance(dist, cnt);
 
           dist_cout++;
           if (dist >= retset[L - 1].distance)
@@ -1561,7 +1561,7 @@ namespace efanna2e
             }
           }
           //dist += dist * cnt / (float)attribute_number_;
-          dist += cnt * weight_search;
+          fusion_distance(dist, cnt);
 
           dist_cout++;
           if (dist >= retset[L - 1].distance)
