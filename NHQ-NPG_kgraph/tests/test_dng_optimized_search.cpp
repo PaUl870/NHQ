@@ -195,7 +195,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
   unsigned L_search =  atoi(argv[8]);
-  float weight_search = 140000;
+  float weight_search = atof(argv[9]);
   efanna2e::Parameters paras;
   paras.Set<unsigned>("L_search", L_search);
   paras.Set<float>("weight_search", weight_search);
